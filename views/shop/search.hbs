@@ -11,7 +11,8 @@
   </form>
 </div><!-- /.row -->
 <hr>
-<h2>Produkty</h2>
+<h2>Wyniki wyszukiwania frazy "{{query}}"</h2>
+{{# if products}}
 {{# each products}}
     <div class="row">
         {{# each this}}
@@ -35,3 +36,6 @@
         {{/each}}
     </div>
 {{/each}}
+{{ else }}
+<h3>Brak wyników</h3>
+{{/if}}

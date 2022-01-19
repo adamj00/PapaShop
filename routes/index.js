@@ -25,6 +25,30 @@ router.get('/', function (req, res, next) {
 });
 
 
+router.post('/search', function (req, res, next) {
+  var query = req.body.query;
+  Product.find({$or: [{"title": {$regex : query}}, {"description": {$regex : query}}]}).lean()
+    .exec(function (error, body) {
+      if (error) {
+        res.render('shop/search', {
+          products: null,
+          query: req.body.query,
+          err: error.message
+        });
+      }
+      var productChunks = [];
+      var chunkSize = 3;
+      for (var i = 0; i < body.length; i += chunkSize) {
+        productChunks.push(body.slice(i, i + chunkSize));
+      }
+      res.render('shop/search', {
+        products: productChunks,
+        query: req.body.query,
+        err: null
+      });
+    });
+});
+
 router.get('/add-to-cart/:id', function (req, res, next) {
   var productId = req.params.id;
   var cart = new Cart(req.session.cart ? req.session.cart : {});

@@ -1,0 +1,13 @@
+<h1>Lista zarejestrowanych użytkowników</h1>
+<table class="table table-bordered">
+  <tr>
+      <td>email</td>
+      <td>is admin</td>
+  </tr>
+  {{# each users}}
+    <tr>
+      <td>{{this.email}}</td>
+      <td>{{this.role}}</td>
+     </tr>
+  {{/each}}
+</table>

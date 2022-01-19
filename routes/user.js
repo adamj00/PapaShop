@@ -5,6 +5,7 @@ var passport = require('passport');
 var Order = require('../models/order');
 var Cart = require('../models/cart');
 const { session } = require('passport');
+var User = require('../models/user');
 var csrfProtection = csrf();
 router.use(csrfProtection);
 
@@ -74,8 +75,6 @@ router.post('/signin', passport.authenticate('local.signin', {
     failureRedirect: '/user/signin',
     failureFlash: true
 }), function(req, res, next) {
-    console.log("logged in. role: ");
-    console.log(req.user.role);
     if (req.session.oldUrl) {
         var oldUrl = req.session.oldUrl;
         req.session.oldUrl = null;
@@ -85,7 +84,6 @@ router.post('/signin', passport.authenticate('local.signin', {
         res.redirect('/user/profile')
     }
 });
-
 
 
 

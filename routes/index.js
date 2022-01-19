@@ -8,6 +8,8 @@ var Product = require('../models/product');
 
 var Order = require('../models/order');
 
+var User = require('../models/user');
+
 /* GET home page. */
 router.get('/', function (req, res, next) {
   Product.find({}).lean()
@@ -129,6 +131,32 @@ router.post('/checkout', isLoggedIn, function(req, res, next) {
   });
 });
 
+// only for admin
+router.get('/all-users',isAdmin, function(req, res, next) {
+  User.find({}).lean()
+  .exec(function(err, users) {
+          if (err) {
+              return res.write('Błąd');
+          }
+          res.render('admin/all-users', {users: users});
+      }); 
+});
+
+router.get('/all-orders',isAdmin, function(req, res, next) {
+  Order.find({}).lean()
+  .exec(function(err, orders) {
+          if (err) {
+              return res.write('Błąd');
+          }
+          var cart;
+            orders.forEach(function(order) {
+                cart = new Cart(order.cart);
+                order.items = cart.generateArray();
+            });
+          res.render('admin/all-orders', {orders: orders});
+      }); 
+});
+
 function isLoggedIn(req, res, next) {
   if (req.isAuthenticated()) {
       return next();
@@ -136,6 +164,15 @@ function isLoggedIn(req, res, next) {
       req.session.oldUrl = req.url;
       res.redirect('/user/signin');
   }
+}
+
+function isAdmin(req, res, next) {
+  if (req.isAuthenticated() && req.user.role) {
+    next();
+} else {
+    req.session.oldUrl = req.url;
+    res.redirect('/');
+}
 }
 
 function notLoggedIn(req, res, next) {

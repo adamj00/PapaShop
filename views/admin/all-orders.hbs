@@ -5,13 +5,21 @@
         {{# each orders }}
             <div class="panel panel-default">
                 <div class="panel-body">
-                    <strong>{{this.name}} | {{this.address}} | {{this.comments}}</strong>
-                    <hr>
+                    <strong>{{this.date}}</strong>
+                    <br>
+                    {{this.name}}
+                    <br>
+                    {{this.address}}
+                    <br>
+                   {{this.email}}
+                    <br>
+                    {{this.comment}}
+                    <br>
                     <ul class="list-group">
                         {{# each this.items }}
                             <li class="list-group-item">
-                                <span class="badge">{{ this.price }} zł</span>
-                                {{ this.item.title }} | ilość: {{ this.qty }}
+                                <span class="badge">{{ this.qty }}</span>
+                                {{ this.item.title }}
                             </li>
                         {{/each}}
                     </ul>

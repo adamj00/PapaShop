@@ -4,33 +4,43 @@ var csrf = require('csurf');
 var passport = require('passport');
 var Order = require('../models/order');
 var Cart = require('../models/cart');
-const { session } = require('passport');
+const {
+    session
+} = require('passport');
 var User = require('../models/user');
 var csrfProtection = csrf();
 router.use(csrfProtection);
 
 
 router.get('/profile', isLoggedIn, function (req, res, next) {
-    Order.find({user: req.user}).lean()
-    .exec(function(err, orders) {
-            if (err) {
-                return res.write('Błąd');
-            }
-            var cart;
-            orders.forEach(function(order) {
-                cart = new Cart(order.cart);
-                order.items = cart.generateArray();
+    if (req.user.role) {
+        res.render('admin/admin');
+    } else {
+        Order.find({
+                user: req.user
+            }).lean()
+            .exec(function (err, orders) {
+                if (err) {
+                    return res.write('Błąd');
+                }
+                var cart;
+                orders.forEach(function (order) {
+                    cart = new Cart(order.cart);
+                    order.items = cart.generateArray();
+                });
+                res.render('user/profile', {
+                    orders: orders
+                });
             });
-            res.render('user/profile', {orders: orders});
-        }); 
+    }
 });
 
-router.get('/logout', isLoggedIn, function(req, res, next) {
+router.get('/logout', isLoggedIn, function (req, res, next) {
     req.logout();
     res.redirect('/');
 });
 
-router.use('/', notLoggedIn, function(req, res, next) {
+router.use('/', notLoggedIn, function (req, res, next) {
     next();
 });
 
@@ -47,14 +57,13 @@ router.get('/signup', function (req, res, next) {
 router.post('/signup', passport.authenticate('local.signup', {
     failureRedirect: '/user/signup',
     failureFlash: true
-}), function(req, res, next) {
+}), function (req, res, next) {
     req.user.role = "user";
     if (req.session.oldUrl) {
         var oldUrl = req.session.oldUrl;
         req.session.oldUrl = null;
         res.redirect(oldUrl);
-    }
-    else {
+    } else {
         res.redirect('/user/profile')
     }
 });
@@ -74,13 +83,12 @@ router.get('/signin', function (req, res, next) {
 router.post('/signin', passport.authenticate('local.signin', {
     failureRedirect: '/user/signin',
     failureFlash: true
-}), function(req, res, next) {
+}), function (req, res, next) {
     if (req.session.oldUrl) {
         var oldUrl = req.session.oldUrl;
         req.session.oldUrl = null;
         res.redirect(oldUrl);
-    }
-    else {
+    } else {
         res.redirect('/user/profile')
     }
 });

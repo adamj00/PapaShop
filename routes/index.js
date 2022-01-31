@@ -9,8 +9,9 @@ var Product = require('../models/product');
 var Order = require('../models/order');
 
 var User = require('../models/user');
+var mongoose = require('mongoose');
 
-/* GET home page. */
+
 router.get('/', function (req, res, next) {
   Product.find({}).lean()
     .exec(function (error, body) {
@@ -33,6 +34,7 @@ router.post('/search', function (req, res, next) {
     .exec(function (error, body) {
       if (error) {
         res.render('shop/search', {
+          title: 'Wyniki wyszukiwania',
           products: null,
           query: req.body.query,
           err: error.message
@@ -44,6 +46,7 @@ router.post('/search', function (req, res, next) {
         productChunks.push(body.slice(i, i + chunkSize));
       }
       res.render('shop/search', {
+        title: 'Wyniki wyszukiwania',
         products: productChunks,
         query: req.body.query,
         err: null
@@ -51,7 +54,7 @@ router.post('/search', function (req, res, next) {
     });
 });
 
-router.get('/add-to-cart/:id', function (req, res, next) {
+router.get('/add-to-cart/:id', isLoggedIn, function (req, res, next) {
   var productId = req.params.id;
   var cart = new Cart(req.session.cart ? req.session.cart : {});
 
@@ -84,7 +87,7 @@ router.get('/remove/:id', function(req, res, next) {
   res.redirect('/shopping-cart');
 });
 
-router.get('/shopping-cart', function (req, res, next) {
+router.get('/shopping-cart', isLoggedIn, function (req, res, next) {
   if (!req.session.cart) {
     return res.render('shop/shopping-cart', {
       products: null
@@ -112,10 +115,12 @@ router.post('/checkout', isLoggedIn, function(req, res, next) {
   var cart = new Cart(req.session.cart);
   var order = new Order({
     user: req.user,
+    email: req.user.email,
     cart: cart,
     address: req.body.address,
     name: req.body.name,
-    comments: req.body.comments
+    comment: req.body.comments,
+    date: Date.now()
   });
   order.save(function(err, result) {
     if (err) {
@@ -131,31 +136,6 @@ router.post('/checkout', isLoggedIn, function(req, res, next) {
   });
 });
 
-// only for admin
-router.get('/all-users',isAdmin, function(req, res, next) {
-  User.find({}).lean()
-  .exec(function(err, users) {
-          if (err) {
-              return res.write('Błąd');
-          }
-          res.render('admin/all-users', {users: users});
-      }); 
-});
-
-router.get('/all-orders',isAdmin, function(req, res, next) {
-  Order.find({}).lean()
-  .exec(function(err, orders) {
-          if (err) {
-              return res.write('Błąd');
-          }
-          var cart;
-            orders.forEach(function(order) {
-                cart = new Cart(order.cart);
-                order.items = cart.generateArray();
-            });
-          res.render('admin/all-orders', {orders: orders});
-      }); 
-});
 
 function isLoggedIn(req, res, next) {
   if (req.isAuthenticated()) {
@@ -166,14 +146,7 @@ function isLoggedIn(req, res, next) {
   }
 }
 
-function isAdmin(req, res, next) {
-  if (req.isAuthenticated() && req.user.role) {
-    next();
-} else {
-    req.session.oldUrl = req.url;
-    res.redirect('/');
-}
-}
+
 
 function notLoggedIn(req, res, next) {
   if (!req.isAuthenticated()) {

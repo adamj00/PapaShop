@@ -4,7 +4,7 @@
     <div class="input-group">
       <input type="text" class="form-control" id="query" name="query" placeholder="Szukana fraza...">
       <span class="input-group-btn">
-        <button class="btn btn-default" type="submit">Szukaj</button>
+        <button class="btn btn-default" type="submit"><i class="fa fa-search" aria-hidden="true"></i> Szukaj</button>
       </span>
     </div><!-- /input-group -->
   </div><!-- /.col-lg-6 -->
@@ -12,10 +12,6 @@
 </div><!-- /.row -->
 <hr>
 
-
-<a href="/all-users">Pokaż wszystkich użytkowników</a>
-<hr>
-<a href="/all-orders">Pokaż wszystkie zamówienia</a>
 
 <h2>Produkty</h2>
 {{# each products}}
@@ -33,7 +29,7 @@
                     <div class="price pull-left">
                         {{ this.price }} zł
                     </div>
- <p><a href="/add-to-cart/{{this._id}}" class="btn btn-success pull-right" role="button">Dodaj do koszyka</a> 
+ <p><a href="/add-to-cart/{{this._id}}" class="btn btn-success pull-right" role="button"><i class="fa fa-cart-plus" aria-hidden="true"></i> Dodaj do koszyka</a> 
                 </div>
             </div>
         </div>

@@ -1,13 +1,22 @@
 <h1>Lista zarejestrowanych użytkowników</h1>
 <table class="table table-bordered">
   <tr>
-      <td>email</td>
-      <td>is admin</td>
+      <td><strong>Adres email</strong></td>
+      <td><strong>Rola</strong></td>
   </tr>
   {{# each users}}
-    <tr>
+   {{#if this.role}}
+    <tr class="info">
       <td>{{this.email}}</td>
-      <td>{{this.role}}</td>
-     </tr>
+        <td>administrator</td>
+         </tr> 
+    {{ else }}
+    <tr class="active">
+      <td>{{this.email}}</td>
+        <td>użytkownik</td>
+        </tr>
+      {{/if}}
+      
+     
   {{/each}}
 </table>

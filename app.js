@@ -9,7 +9,8 @@ var mongoose = require('mongoose');
 var session = require('express-session');
 var indexRouter = require('./routes/index');
 
-var userRoutes = require('./routes/user')
+var userRoutes = require('./routes/user');
+var adminRoutes = require('./routes/admin');
 
 var passport = require('passport');
 var flash = require('connect-flash');
@@ -50,11 +51,13 @@ app.use(passport.session());
 
 app.use(function(req, res, next) {
   res.locals.login = req.isAuthenticated();
+  res.locals.admin = req.isAuthenticated() && req.user.role;
   res.locals.session = req.session;
   next();
 });
 
 app.use('/user', userRoutes);
+app.use('/admin', adminRoutes);
 app.use('/', indexRouter);
 
 
